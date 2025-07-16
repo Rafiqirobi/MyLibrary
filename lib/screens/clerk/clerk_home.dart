@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_library/widgets/app_drawer.dart';
+import 'package:my_library/screens/clerk/add_book_screen.dart';
+import 'package:my_library/screens/clerk/manage_books_screen.dart';
 
 class ClerkHome extends StatelessWidget {
   @override
@@ -26,7 +28,12 @@ class ClerkHome extends StatelessWidget {
                   icon: Icons.add,
                   title: 'Add New Book',
                   onTap: () {
-                    Navigator.pushNamed(context, '/clerk/add-book');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddBookScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildDashboardCard(
@@ -34,23 +41,12 @@ class ClerkHome extends StatelessWidget {
                   icon: Icons.library_books,
                   title: 'Manage Books',
                   onTap: () {
-                    Navigator.pushNamed(context, '/clerk/manage-books');
-                  },
-                ),
-                _buildDashboardCard(
-                  context,
-                  icon: Icons.people,
-                  title: 'Manage Readers',
-                  onTap: () {
-                    // Navigate to manage readers screen
-                  },
-                ),
-                _buildDashboardCard(
-                  context,
-                  icon: Icons.history,
-                  title: 'Borrowing History',
-                  onTap: () {
-                    // Navigate to borrowing history screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ManageBooksScreen(),
+                      ),
+                    );
                   },
                 ),
               ],

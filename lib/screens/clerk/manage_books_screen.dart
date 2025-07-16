@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:my_library/models/book.dart';
 import 'package:my_library/services/database_service.dart';
-import 'package:my_library/widgets/book_card.dart';
-import 'package:my_library/screens/reader/book_detail_screen.dart';
+import 'package:my_library/screens/clerk/add_book_screen.dart';
+import 'package:my_library/screens/clerk/edit_book_screen.dart';
 
 class ManageBooksScreen extends StatefulWidget {
   @override
@@ -40,6 +40,49 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
     );
   }
 
+  void _showBookDetails(Book book) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(book.title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Author: ${book.author}'),
+            Text('Category: ${book.category}'),
+            Text('Language: ${book.language}'),
+            Text('Pages: ${book.pages}'),
+            Text('Published: ${book.publishDate.year}'),
+            Text('Copies: ${book.availableCopies}/${book.totalCopies}'),
+            Text('Available: ${book.isAvailable ? 'Yes' : 'No'}'),
+            SizedBox(height: 8),
+            Text('Description:'),
+            Text(book.description, style: TextStyle(fontSize: 12)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditBookScreen(book: book),
+                ),
+              ).then((_) => _loadBooks());
+            },
+            child: Text('Edit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +92,12 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, '/clerk/add-book');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddBookScreen(),
+                ),
+              ).then((_) => _loadBooks()); // Refresh when returning
             },
           ),
         ],
@@ -103,16 +151,17 @@ class _ManageBooksScreenState extends State<ManageBooksScreen> {
                           trailing: IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              // Navigate to edit screen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditBookScreen(book: book),
+                                ),
+                              ).then((_) => _loadBooks()); // Refresh when returning
                             },
                           ),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BookDetailScreen(book: book),
-                              ),
-                            );
+                            // Show book details in a dialog or navigate to detail screen
+                            _showBookDetails(book);
                           },
                         ),
                       ),

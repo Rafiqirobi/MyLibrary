@@ -1,6 +1,7 @@
 import 'package:my_library/models/book.dart';
 import 'package:my_library/models/review.dart';
 import 'package:my_library/models/favorite.dart';
+import 'package:my_library/models/user.dart';
 
 class DatabaseService {
   // Mock database - replace with actual Firestore or other database implementation
@@ -34,6 +35,52 @@ class DatabaseService {
       isAvailable: true,
       totalCopies: 3,
       availableCopies: 1,
+    ),
+  ];
+
+  // Mock users database
+  final List<AppUser> _users = [
+    AppUser(
+      id: '1',
+      name: 'Reader User',
+      email: 'reader@example.com',
+      role: 'reader',
+      joinDate: DateTime.now().subtract(Duration(days: 30)),
+    ),
+    AppUser(
+      id: '2',
+      name: 'Clerk User',
+      email: 'clerk@example.com',
+      role: 'clerk',
+      joinDate: DateTime.now().subtract(Duration(days: 20)),
+    ),
+    AppUser(
+      id: '3',
+      name: 'Manager User',
+      email: 'manager@example.com',
+      role: 'manager',
+      joinDate: DateTime.now().subtract(Duration(days: 10)),
+    ),
+    AppUser(
+      id: '4',
+      name: 'Alice Johnson',
+      email: 'alice@example.com',
+      role: 'reader',
+      joinDate: DateTime.now().subtract(Duration(days: 5)),
+    ),
+    AppUser(
+      id: '5',
+      name: 'Bob Smith',
+      email: 'bob@example.com',
+      role: 'reader',
+      joinDate: DateTime.now().subtract(Duration(days: 15)),
+    ),
+    AppUser(
+      id: '6',
+      name: 'Carol Davis',
+      email: 'carol@example.com',
+      role: 'clerk',
+      joinDate: DateTime.now().subtract(Duration(days: 25)),
     ),
   ];
 
@@ -182,5 +229,64 @@ class DatabaseService {
     if (!_favorites.any((fav) => fav.userId == userId && fav.bookId == bookId)) {
       _favorites.add(favorite);
     }
+  }
+
+  Future<void> updateBookAvailability(String bookId, bool isAvailable) async {
+    await Future.delayed(Duration(milliseconds: 300));
+    final index = _books.indexWhere((book) => book.id == bookId);
+    if (index != -1) {
+      final book = _books[index];
+      _books[index] = Book(
+        id: book.id,
+        title: book.title,
+        author: book.author,
+        description: book.description,
+        category: book.category,
+        language: book.language,
+        coverUrl: book.coverUrl,
+        fileUrl: book.fileUrl,
+        publishDate: book.publishDate,
+        pages: book.pages,
+        isAvailable: isAvailable,
+        totalCopies: book.totalCopies,
+        availableCopies: book.availableCopies,
+      );
+    }
+  }
+
+  // User management methods
+  Future<List<AppUser>> getUsers() async {
+    await Future.delayed(Duration(milliseconds: 300));
+    return _users;
+  }
+
+  Future<AppUser?> getUserById(String id) async {
+    await Future.delayed(Duration(milliseconds: 200));
+    try {
+      return _users.firstWhere((user) => user.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> updateUser(AppUser updatedUser) async {
+    await Future.delayed(Duration(milliseconds: 300));
+    final index = _users.indexWhere((user) => user.id == updatedUser.id);
+    if (index != -1) {
+      _users[index] = updatedUser;
+    }
+  }
+
+  Future<void> deleteUser(String id) async {
+    await Future.delayed(Duration(milliseconds: 300));
+    _users.removeWhere((user) => user.id == id);
+  }
+
+  Future<List<AppUser>> searchUsers(String query) async {
+    await Future.delayed(Duration(milliseconds: 200));
+    return _users.where((user) =>
+        user.name.toLowerCase().contains(query.toLowerCase()) ||
+        user.email.toLowerCase().contains(query.toLowerCase()) ||
+        user.role.toLowerCase().contains(query.toLowerCase())).toList();
   }
 }

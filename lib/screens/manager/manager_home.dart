@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_library/widgets/app_drawer.dart';
+import 'package:my_library/screens/manager/user_management_screen.dart';
+import 'package:my_library/screens/manager/books_inventory_screen.dart';
+import 'package:my_library/screens/manager/reports_screen.dart';
 
 class ManagerHome extends StatelessWidget {
   @override
@@ -26,7 +29,12 @@ class ManagerHome extends StatelessWidget {
                   icon: Icons.people,
                   title: 'User Management',
                   onTap: () {
-                    Navigator.pushNamed(context, '/manager/user-management');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserManagementScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildDashboardCard(
@@ -34,7 +42,12 @@ class ManagerHome extends StatelessWidget {
                   icon: Icons.library_books,
                   title: 'Books Inventory',
                   onTap: () {
-                    // Navigate to books inventory
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BooksInventoryScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildDashboardCard(
@@ -42,7 +55,12 @@ class ManagerHome extends StatelessWidget {
                   icon: Icons.analytics,
                   title: 'Reports',
                   onTap: () {
-                    Navigator.pushNamed(context, '/manager/reports');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReportsScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildDashboardCard(

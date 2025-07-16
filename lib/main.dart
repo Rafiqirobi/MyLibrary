@@ -39,11 +39,16 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     
+    print('🔍 AuthWrapper: Checking authentication state');
+    print('🔍 AuthWrapper: currentUser = ${authService.currentUser?.email ?? 'null'}');
+    
     if (authService.currentUser != null) {
       // User is logged in, show appropriate dashboard
+      print('🔍 AuthWrapper: User is logged in, showing RoleBasedHome');
       return RoleBasedHome(user: authService.currentUser!);
     } else {
       // User is not logged in, show login screen
+      print('🔍 AuthWrapper: User is not logged in, showing LoginScreen');
       return LoginScreen();
     }
   }
@@ -56,14 +61,25 @@ class RoleBasedHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('=== ROLE-BASED HOME ==='); // Debug line
+    print('User: ${user.name}'); // Debug line
+    print('Email: ${user.email}'); // Debug line
+    print('Role: "${user.role}"'); // Debug line
+    print('Role length: ${user.role.length}'); // Debug line
+    
     switch (user.role) {
       case 'reader':
+        print('→ Routing to ReaderHome'); // Debug line
         return ReaderHome();
       case 'clerk':
+        print('→ Routing to ClerkHome'); // Debug line
         return ClerkHome();
       case 'manager':
+        print('→ Routing to ManagerHome'); // Debug line
         return ManagerHome();
       default:
+        print('❌ Invalid role: "${user.role}"'); // Debug line
+        print('Available roles: reader, clerk, manager'); // Debug line
         return LoginScreen(); // Fallback to login if role is invalid
     }
   }

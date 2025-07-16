@@ -8,7 +8,7 @@ import 'package:my_library/screens/manager/manager_home.dart';
 import 'package:my_library/screens/reader/favorites_screen.dart';
 import 'package:my_library/screens/reader/wishlist_screen.dart';
 import 'package:my_library/screens/settings/settings_screen.dart';
-import 'package:my_library/screens/auth/login_screen.dart';
+import 'package:my_library/main.dart'; // For AuthWrapper
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -173,13 +173,18 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () async {
+                print('🚪 AppDrawer: Logout button tapped');
                 Navigator.pop(context);
+                print('🚪 AppDrawer: Calling authService.logout()');
                 await authService.logout();
+                print('🚪 AppDrawer: Logout completed, navigating to AuthWrapper');
+                // Navigate to root and let AuthWrapper handle the authentication state
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  MaterialPageRoute(builder: (context) => AuthWrapper()),
                   (route) => false,
                 );
+                print('🚪 AppDrawer: Navigation completed');
               },
             ),
           ] else ...[
