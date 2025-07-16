@@ -4,6 +4,7 @@ import 'package:my_library/screens/clerk/clerk_home.dart';
 import 'package:my_library/screens/manager/manager_home.dart';
 import 'package:my_library/screens/reader/reader_home.dart';
 import 'package:my_library/services/auth_service.dart';
+import 'package:my_library/services/database_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:my_library/models/user.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        Provider(create: (_) => DatabaseService()),
       ],
       child: MaterialApp(
         title: 'myLibrary - Malay eBook Repository',

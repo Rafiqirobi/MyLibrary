@@ -20,7 +20,14 @@ class _ReaderHomeState extends State<ReaderHome> {
   @override
   void initState() {
     super.initState();
-    _loadBooks();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isLoading) {
+      _loadBooks();
+    }
   }
 
   Future<void> _loadBooks() async {
