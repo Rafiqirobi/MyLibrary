@@ -15,20 +15,17 @@ class _AddBookScreenState extends State<AddBookScreen> {
   final _descriptionController = TextEditingController();
   final _pagesController = TextEditingController();
   final _copiesController = TextEditingController(text: '1');
-  String _category = 'Novel';
+  String _genre = 'Romantik';
   String _language = 'Malay';
   bool _isAvailable = true;
   bool _isLoading = false;
 
-  final List<String> _categories = [
-    'Novel',
-    'Epik',
-    'Puisi',
+  final List<String> _genres = [
+    'Romantik',
+    'Komedi',
+    'Thriller/Jenayah',
     'Sejarah',
-    'Agama',
-    'Sains',
-    'Teknologi',
-    'Kanak-kanak',
+    'Seram',
   ];
 
   @override
@@ -51,7 +48,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
       title: _titleController.text.trim(),
       author: _authorController.text.trim(),
       description: _descriptionController.text.trim(),
-      category: _category,
+      genre: _genre,
       language: _language,
       coverUrl: '', // In a real app, you would upload an image
       fileUrl: '', // In a real app, you would upload a PDF
@@ -129,20 +126,20 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _category,
+                value: _genre,
                 decoration: InputDecoration(
-                  labelText: 'Category',
+                  labelText: 'Genre',
                   border: OutlineInputBorder(),
                 ),
-                items: _categories.map((category) {
+                items: _genres.map((genre) {
                   return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
+                    value: genre,
+                    child: Text(genre),
                   );
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
-                    _category = value!;
+                    _genre = value!;
                   });
                 },
               ),

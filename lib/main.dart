@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:my_library/firebase_options.dart';
 import 'package:my_library/screens/auth/login_screen.dart';
 import 'package:my_library/screens/clerk/clerk_home.dart';
 import 'package:my_library/screens/manager/manager_home.dart';
@@ -9,7 +11,11 @@ import 'package:provider/provider.dart';
 
 import 'package:my_library/models/user.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -37,20 +43,22 @@ class MyApp extends StatelessWidget {
 class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
-    
-    print('🔍 AuthWrapper: Checking authentication state');
-    print('🔍 AuthWrapper: currentUser = ${authService.currentUser?.email ?? 'null'}');
-    
-    if (authService.currentUser != null) {
-      // User is logged in, show appropriate dashboard
-      print('🔍 AuthWrapper: User is logged in, showing RoleBasedHome');
-      return RoleBasedHome(user: authService.currentUser!);
-    } else {
-      // User is not logged in, show login screen
-      print('🔍 AuthWrapper: User is not logged in, showing LoginScreen');
-      return LoginScreen();
-    }
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        print('🔍 AuthWrapper: Checking authentication state');
+        print('🔍 AuthWrapper: currentUser = ${authService.currentUser?.email ?? 'null'}');
+        
+        if (authService.currentUser != null) {
+          // User is logged in, show appropriate dashboard
+          print('🔍 AuthWrapper: User is logged in, showing RoleBasedHome');
+          return RoleBasedHome(user: authService.currentUser!);
+        } else {
+          // User is not logged in, show login screen
+          print('🔍 AuthWrapper: User is not logged in, showing LoginScreen');
+          return LoginScreen();
+        }
+      },
+    );
   }
 }
 

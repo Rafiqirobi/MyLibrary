@@ -19,7 +19,7 @@ class AppUser {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       role: map['role'] ?? 'reader',
-      joinDate: map['joinDate']?.toDate(),
+      joinDate: map['joinDate'], // Don't call toDate() here, pass the DateTime directly
     );
   }
 

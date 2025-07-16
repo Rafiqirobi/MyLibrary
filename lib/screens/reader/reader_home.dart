@@ -4,7 +4,7 @@ import 'package:my_library/models/book.dart';
 import 'package:my_library/services/database_service.dart';
 import 'package:my_library/widgets/app_drawer.dart';
 import 'package:my_library/widgets/book_card.dart';
-import 'package:my_library/screens/reader/book_detail_screen_enhanced.dart';
+import 'package:my_library/screens/reader/book_detail_screen.dart';
 
 class ReaderHome extends StatefulWidget {
   @override
@@ -20,46 +20,54 @@ class _ReaderHomeState extends State<ReaderHome> {
   @override
   void initState() {
     super.initState();
+    _loadBooks();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_isLoading) {
-      _loadBooks();
-    }
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadBooks() async {
     try {
       final db = Provider.of<DatabaseService>(context, listen: false);
       final books = await db.getBooks();
-      setState(() {
-        _books = books;
-        _filteredBooks = books;
-        _isLoading = false;
-      });
+      
+      // Check if the widget is still mounted before calling setState
+      if (mounted) {
+        setState(() {
+          _books = books;
+          _filteredBooks = books;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading books: ${e.toString()}')),
-      );
+      // Check if the widget is still mounted before calling setState
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading books: ${e.toString()}')),
+        );
+      }
     }
   }
 
   void _searchBooks(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredBooks = _books;
-      } else {
-        _filteredBooks = _books.where((book) =>
-            book.title.toLowerCase().contains(query.toLowerCase()) ||
-            book.author.toLowerCase().contains(query.toLowerCase()) ||
-            book.category.toLowerCase().contains(query.toLowerCase())).toList();
-      }
-    });
+    if (mounted) {
+      setState(() {
+        if (query.isEmpty) {
+          _filteredBooks = _books;
+        } else {
+          _filteredBooks = _books.where((book) =>
+              book.title.toLowerCase().contains(query.toLowerCase()) ||
+              book.author.toLowerCase().contains(query.toLowerCase()) ||
+              book.category.toLowerCase().contains(query.toLowerCase())).toList();
+        }
+      });
+    }
   }
 
   void _showSearchBottomSheet() {
@@ -161,30 +169,34 @@ class _ReaderHomeState extends State<ReaderHome> {
 
   void _filterBooks(String filterType, String query) {
     if (query.isEmpty) {
-      setState(() {
-        _filteredBooks = _books;
-      });
+      if (mounted) {
+        setState(() {
+          _filteredBooks = _books;
+        });
+      }
       return;
     }
 
-    setState(() {
-      switch (filterType) {
-        case 'title':
-          _filteredBooks = _books.where((book) =>
-              book.title.toLowerCase().contains(query.toLowerCase())).toList();
-          break;
-        case 'author':
-          _filteredBooks = _books.where((book) =>
-              book.author.toLowerCase().contains(query.toLowerCase())).toList();
-          break;
-        case 'category':
-          _filteredBooks = _books.where((book) =>
-              book.category.toLowerCase().contains(query.toLowerCase())).toList();
-          break;
-        default:
-          _filteredBooks = _books;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        switch (filterType) {
+          case 'title':
+            _filteredBooks = _books.where((book) =>
+                book.title.toLowerCase().contains(query.toLowerCase())).toList();
+            break;
+          case 'author':
+            _filteredBooks = _books.where((book) =>
+                book.author.toLowerCase().contains(query.toLowerCase())).toList();
+            break;
+          case 'category':
+            _filteredBooks = _books.where((book) =>
+                book.category.toLowerCase().contains(query.toLowerCase())).toList();
+            break;
+          default:
+            _filteredBooks = _books;
+        }
+      });
+    }
   }
 
   @override

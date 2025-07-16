@@ -220,7 +220,7 @@ class _BooksInventoryScreenState extends State<BooksInventoryScreen> {
         title: book.title,
         author: book.author,
         description: book.description,
-        category: book.category,
+        genre: book.genre,
         language: book.language,
         coverUrl: book.coverUrl,
         fileUrl: book.fileUrl,
@@ -353,68 +353,74 @@ class _BooksInventoryScreenState extends State<BooksInventoryScreen> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedCategory,
-                              items: _categories.map((category) => DropdownMenuItem(
-                                value: category,
-                                child: Text(category),
-                              )).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedCategory = value!;
-                                });
-                                _applyFilters();
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Category',
-                                border: OutlineInputBorder(),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: DropdownButtonFormField<String>(
+                                value: _selectedCategory,
+                                items: _categories.map((category) => DropdownMenuItem(
+                                  value: category,
+                                  child: Text(category),
+                                )).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedCategory = value!;
+                                  });
+                                  _applyFilters();
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Category',
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedLanguage,
-                              items: _languages.map((language) => DropdownMenuItem(
-                                value: language,
-                                child: Text(language),
-                              )).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedLanguage = value!;
-                                });
-                                _applyFilters();
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Language',
-                                border: OutlineInputBorder(),
+                            SizedBox(width: 16),
+                            SizedBox(
+                              width: 150,
+                              child: DropdownButtonFormField<String>(
+                                value: _selectedLanguage,
+                                items: _languages.map((language) => DropdownMenuItem(
+                                  value: language,
+                                  child: Text(language),
+                                )).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedLanguage = value!;
+                                  });
+                                  _applyFilters();
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Language',
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _sortBy,
-                              items: _sortOptions.map((option) => DropdownMenuItem(
-                                value: option,
-                                child: Text(option.replaceAll('_', ' ').toUpperCase()),
-                              )).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _sortBy = value!;
-                                });
-                                _applyFilters();
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sort By',
-                                border: OutlineInputBorder(),
+                            SizedBox(width: 16),
+                            SizedBox(
+                              width: 150,
+                              child: DropdownButtonFormField<String>(
+                                value: _sortBy,
+                                items: _sortOptions.map((option) => DropdownMenuItem(
+                                  value: option,
+                                  child: Text(option.replaceAll('_', ' ').toUpperCase()),
+                                )).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _sortBy = value!;
+                                  });
+                                  _applyFilters();
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sort By',
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

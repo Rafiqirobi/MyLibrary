@@ -4,7 +4,7 @@ import 'package:my_library/models/book.dart';
 import 'package:my_library/services/database_service.dart';
 import 'package:my_library/services/auth_service.dart';
 import 'package:my_library/widgets/book_card.dart';
-import 'package:my_library/screens/reader/book_detail_screen_enhanced.dart';
+import 'package:my_library/screens/reader/book_detail_screen.dart';
 
 class WishlistScreen extends StatefulWidget {
   @override

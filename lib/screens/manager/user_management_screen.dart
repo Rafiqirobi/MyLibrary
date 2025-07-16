@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_library/models/user.dart';
+import 'package:my_library/services/database_service.dart';
 
 class UserManagementScreen extends StatefulWidget {
   @override
@@ -7,6 +8,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
+  final DatabaseService _databaseService = DatabaseService();
   final TextEditingController _searchController = TextEditingController();
   List<AppUser> _users = [];
   List<AppUser> _filteredUsers = [];
@@ -23,59 +25,24 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       _isLoading = true;
     });
 
-    // Mock users data - in a real app, this would come from your database
-    await Future.delayed(Duration(milliseconds: 500));
-
-    _users = [
-      AppUser(
-        id: '1',
-        name: 'Reader User',
-        email: 'reader@example.com',
-        role: 'reader',
-        joinDate: DateTime.now().subtract(Duration(days: 30)),
-      ),
-      AppUser(
-        id: '2',
-        name: 'Clerk User',
-        email: 'clerk@example.com',
-        role: 'clerk',
-        joinDate: DateTime.now().subtract(Duration(days: 20)),
-      ),
-      AppUser(
-        id: '3',
-        name: 'Manager User',
-        email: 'manager@example.com',
-        role: 'manager',
-        joinDate: DateTime.now().subtract(Duration(days: 10)),
-      ),
-      AppUser(
-        id: '4',
-        name: 'Alice Johnson',
-        email: 'alice@example.com',
-        role: 'reader',
-        joinDate: DateTime.now().subtract(Duration(days: 5)),
-      ),
-      AppUser(
-        id: '5',
-        name: 'Bob Smith',
-        email: 'bob@example.com',
-        role: 'reader',
-        joinDate: DateTime.now().subtract(Duration(days: 15)),
-      ),
-      AppUser(
-        id: '6',
-        name: 'Carol Davis',
-        email: 'carol@example.com',
-        role: 'clerk',
-        joinDate: DateTime.now().subtract(Duration(days: 25)),
-      ),
-    ];
-
-    _filteredUsers = _users;
-
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      final users = await _databaseService.getUsers();
+      setState(() {
+        _users = users;
+        _filteredUsers = users;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading users: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _filterUsers(String query) {
@@ -175,27 +142,41 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  void _updateUserRole(AppUser user, String newRole) {
-    setState(() {
-      final index = _users.indexWhere((u) => u.id == user.id);
-      if (index != -1) {
-        _users[index] = AppUser(
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: newRole,
-          joinDate: user.joinDate,
-        );
-        _filterUsers(_searchController.text);
-      }
-    });
+  void _updateUserRole(AppUser user, String newRole) async {
+    try {
+      final updatedUser = AppUser(
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: newRole,
+        joinDate: user.joinDate,
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${user.name}\'s role updated to ${newRole.toUpperCase()}'),
-        backgroundColor: Colors.green,
-      ),
-    );
+      await _databaseService.updateUser(updatedUser);
+      
+      // Update local list
+      setState(() {
+        final index = _users.indexWhere((u) => u.id == user.id);
+        if (index != -1) {
+          _users[index] = updatedUser;
+          _filterUsers(_searchController.text);
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${user.name}\'s role updated to ${newRole.toUpperCase()}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error updating user role: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _deleteUser(AppUser user) {
@@ -210,18 +191,28 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             child: Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              setState(() {
-                _users.removeWhere((u) => u.id == user.id);
-                _filterUsers(_searchController.text);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${user.name} deleted successfully'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              try {
+                await _databaseService.deleteUser(user.id);
+                setState(() {
+                  _users.removeWhere((u) => u.id == user.id);
+                  _filterUsers(_searchController.text);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${user.name} deleted successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error deleting user: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: Text('Delete'),
             style: TextButton.styleFrom(foregroundColor: Colors.red),

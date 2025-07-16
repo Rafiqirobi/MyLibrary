@@ -23,32 +23,23 @@ class _EditBookScreenState extends State<EditBookScreen> {
   late TextEditingController _totalCopiesController;
   late TextEditingController _availableCopiesController;
   
-  late String _selectedCategory;
+  late String _selectedGenre;
   late bool _isAvailable;
   bool _isLoading = false;
 
-  late List<String> _categories;
+  late List<String> _genres;
 
   @override
   void initState() {
     super.initState();
     
-    // Initialize categories list
-    _categories = [
-      'Fiction',
-      'Non-Fiction',
-      'Science',
-      'History',
-      'Biography',
-      'Technology',
-      'Arts',
-      'Religion',
-      'Philosophy',
-      'Literature',
-      'Children',
-      'Reference',
-      'Epik',
-      'Novel',
+    // Initialize genres list with proper Malay genres
+    _genres = [
+      'Romantik',
+      'Komedi',
+      'Thriller/Jenayah',
+      'Sejarah',
+      'Seram',
     ];
     
     _titleController = TextEditingController(text: widget.book.title);
@@ -60,10 +51,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
     _totalCopiesController = TextEditingController(text: widget.book.totalCopies.toString());
     _availableCopiesController = TextEditingController(text: widget.book.availableCopies.toString());
     
-    // Set the selected category, with fallback to first category if not found
-    _selectedCategory = _categories.contains(widget.book.category) 
-        ? widget.book.category 
-        : _categories.first;
+    // Set the selected genre, with fallback to first genre if not found
+    _selectedGenre = _genres.contains(widget.book.genre) 
+        ? widget.book.genre 
+        : _genres.first;
     _isAvailable = widget.book.isAvailable;
   }
 
@@ -92,7 +83,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
       title: _titleController.text.trim(),
       author: _authorController.text.trim(),
       description: _descriptionController.text.trim(),
-      category: _selectedCategory,
+      genre: _selectedGenre,
       language: _languageController.text.trim(),
       coverUrl: _coverUrlController.text.trim(),
       fileUrl: widget.book.fileUrl, // Keep original file URL
@@ -171,28 +162,28 @@ class _EditBookScreenState extends State<EditBookScreen> {
                 ),
                 SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  value: _selectedGenre,
                   decoration: InputDecoration(
-                    labelText: 'Category *',
+                    labelText: 'Genre *',
                     prefixIcon: Icon(Icons.category),
                     border: OutlineInputBorder(),
                   ),
-                  items: _categories.map((category) {
+                  items: _genres.map((genre) {
                     return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
+                      value: genre,
+                      child: Text(genre),
                     );
                   }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
-                        _selectedCategory = value;
+                        _selectedGenre = value;
                       });
                     }
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please select a category';
+                      return 'Please select a genre';
                     }
                     return null;
                   },

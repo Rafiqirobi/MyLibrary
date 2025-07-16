@@ -2,8 +2,9 @@ class Book {
   final String id;
   final String title;
   final String author;
+  final String? penerbit; // Publisher
   final String description;
-  final String category;
+  final String genre; // Changed from category to genre
   final String language; // Malay/English
   final String coverUrl;
   final String fileUrl;
@@ -17,25 +18,30 @@ class Book {
     required this.id,
     required this.title,
     required this.author,
+    this.penerbit,
     required this.description,
-    required this.category,
+    required this.genre,
     required this.language,
-    required this.coverUrl,
-    required this.fileUrl,
+    this.coverUrl = '',
+    this.fileUrl = '',
     required this.publishDate,
     required this.pages,
     required this.isAvailable,
-    required this.totalCopies,
-    required this.availableCopies,
+    this.totalCopies = 1,
+    this.availableCopies = 1,
   });
+
+  // For backward compatibility, add a getter for category
+  String get category => genre;
 
   factory Book.fromMap(Map<String, dynamic> map) {
     return Book(
       id: map['id'] ?? '',
       title: map['title'] ?? '',
       author: map['author'] ?? '',
+      penerbit: map['penerbit'],
       description: map['description'] ?? '',
-      category: map['category'] ?? '',
+      genre: map['genre'] ?? map['category'] ?? '', // Support both field names
       language: map['language'] ?? 'Malay',
       coverUrl: map['coverUrl'] ?? '',
       fileUrl: map['fileUrl'] ?? '',
@@ -52,8 +58,10 @@ class Book {
       'id': id,
       'title': title,
       'author': author,
+      'penerbit': penerbit,
       'description': description,
-      'category': category,
+      'genre': genre,
+      'category': genre, // For backward compatibility
       'language': language,
       'coverUrl': coverUrl,
       'fileUrl': fileUrl,

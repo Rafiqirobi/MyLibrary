@@ -20,24 +20,15 @@ class _AddBookScreenState extends State<AddBookScreen> {
   final _languageController = TextEditingController();
   final _coverUrlController = TextEditingController();
   
-  String _selectedCategory = 'Fiction';
+  String _selectedGenre = 'Romantik';
   bool _isLoading = false;
 
-  final List<String> _categories = [
-    'Fiction',
-    'Non-Fiction',
-    'Science',
-    'History',
-    'Biography',
-    'Technology',
-    'Arts',
-    'Religion',
-    'Philosophy',
-    'Literature',
-    'Children',
-    'Reference',
-    'Epik',
-    'Novel',
+  final List<String> _genres = [
+    'Romantik',
+    'Komedi',
+    'Thriller/Jenayah',
+    'Sejarah',
+    'Seram',
   ];
 
   @override
@@ -66,7 +57,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
       title: _titleController.text.trim(),
       author: _authorController.text.trim(),
       description: _descriptionController.text.trim(),
-      category: _selectedCategory,
+      genre: _selectedGenre,
       language: _languageController.text.trim().isEmpty ? 'Malay' : _languageController.text.trim(),
       coverUrl: _coverUrlController.text.trim().isEmpty ? 'https://via.placeholder.com/200x300?text=No+Cover' : _coverUrlController.text.trim(),
       fileUrl: 'https://example.com/books/${DateTime.now().millisecondsSinceEpoch}.pdf', // Mock file URL
@@ -154,21 +145,21 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
                 SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  value: _selectedGenre,
                   decoration: InputDecoration(
-                    labelText: 'Category *',
+                    labelText: 'Genre *',
                     prefixIcon: Icon(Icons.category),
                     border: OutlineInputBorder(),
                   ),
-                  items: _categories.map((category) {
+                  items: _genres.map((genre) {
                     return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
+                      value: genre,
+                      child: Text(genre),
                     );
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      _selectedCategory = value!;
+                      _selectedGenre = value!;
                     });
                   },
                 ),
