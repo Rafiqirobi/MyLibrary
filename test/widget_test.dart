@@ -8,23 +8,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mylibrary/main.dart';
+import 'package:my_library/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('MyApp widget test', (WidgetTester tester) async {
+    print('Starting MyApp widget test...');
+    
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp());
+    print('MyApp widget created successfully');
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the app initializes without errors
+    expect(find.byType(MyApp), findsOneWidget);
+    print('MyApp widget found in widget tree');
+    
+    // Since AuthWrapper will show LoginScreen initially (no user logged in)
+    // We can test that the authentication flow is working
+    await tester.pumpAndSettle();
+    print('Widget tree settled after pump');
+    
+    // The app should display some content (either login screen or dashboard)
+    expect(find.byType(MaterialApp), findsOneWidget);
+    print('MaterialApp widget found - test completed successfully');
   });
 }

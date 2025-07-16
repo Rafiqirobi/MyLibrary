@@ -4,7 +4,7 @@ import 'package:my_library/models/book.dart';
 import 'package:my_library/services/database_service.dart';
 import 'package:my_library/widgets/app_drawer.dart';
 import 'package:my_library/widgets/book_card.dart';
-import 'package:my_library/screens/reader/book_detail_screen.dart';
+import 'package:my_library/screens/reader/book_detail_screen_enhanced.dart';
 
 class ReaderHome extends StatefulWidget {
   @override
@@ -24,20 +24,159 @@ class _ReaderHomeState extends State<ReaderHome> {
   }
 
   Future<void> _loadBooks() async {
-    final db = Provider.of<DatabaseService>(context, listen: false);
-    final books = await db.getBooks();
-    setState(() {
-      _books = books;
-      _filteredBooks = books;
-      _isLoading = false;
-    });
+    try {
+      final db = Provider.of<DatabaseService>(context, listen: false);
+      final books = await db.getBooks();
+      setState(() {
+        _books = books;
+        _filteredBooks = books;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading books: ${e.toString()}')),
+      );
+    }
   }
 
   void _searchBooks(String query) {
     setState(() {
-      _filteredBooks = _books.where((book) =>
-          book.title.toLowerCase().contains(query.toLowerCase()) ||
-          book.author.toLowerCase().contains(query.toLowerCase())).toList();
+      if (query.isEmpty) {
+        _filteredBooks = _books;
+      } else {
+        _filteredBooks = _books.where((book) =>
+            book.title.toLowerCase().contains(query.toLowerCase()) ||
+            book.author.toLowerCase().contains(query.toLowerCase()) ||
+            book.category.toLowerCase().contains(query.toLowerCase())).toList();
+      }
+    });
+  }
+
+  void _showSearchBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                onChanged: _searchBooks,
+                decoration: InputDecoration(
+                  labelText: 'Search books',
+                  hintText: 'Search by title, author, or category...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Search by:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showFilterDialog('title');
+                    },
+                    child: Text('Title'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showFilterDialog('author');
+                    },
+                    child: Text('Author'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showFilterDialog('category');
+                    },
+                    child: Text('Category'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFilterDialog(String filterType) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String query = '';
+        return AlertDialog(
+          title: Text('Search by ${filterType.toUpperCase()}'),
+          content: TextField(
+            onChanged: (value) {
+              query = value;
+            },
+            decoration: InputDecoration(
+              labelText: 'Enter ${filterType}',
+              hintText: 'Type to search...',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _searchBooks('');
+              },
+              child: Text('Clear'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _filterBooks(filterType, query);
+              },
+              child: Text('Search'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _filterBooks(String filterType, String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredBooks = _books;
+      });
+      return;
+    }
+
+    setState(() {
+      switch (filterType) {
+        case 'title':
+          _filteredBooks = _books.where((book) =>
+              book.title.toLowerCase().contains(query.toLowerCase())).toList();
+          break;
+        case 'author':
+          _filteredBooks = _books.where((book) =>
+              book.author.toLowerCase().contains(query.toLowerCase())).toList();
+          break;
+        case 'category':
+          _filteredBooks = _books.where((book) =>
+              book.category.toLowerCase().contains(query.toLowerCase())).toList();
+          break;
+        default:
+          _filteredBooks = _books;
+      }
     });
   }
 
@@ -49,44 +188,89 @@ class _ReaderHomeState extends State<ReaderHome> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: BookSearchDelegate(_books),
-              );
-            },
+            onPressed: _showSearchBottomSheet,
           ),
         ],
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _filteredBooks.isEmpty
-              ? Center(child: Text('No books found'))
-              : GridView.builder(
-                  padding: EdgeInsets.all(8),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.7,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: _filteredBooks.length,
-                  itemBuilder: (context, index) {
-                    final book = _filteredBooks[index];
-                    return BookCard(
-                      book: book,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BookDetailScreen(book: book),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+      body: Column(
+        children: [
+          // Search bar
+          Container(
+            padding: EdgeInsets.all(16),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _searchBooks,
+              decoration: InputDecoration(
+                hintText: 'Search by title, author, or category...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          _searchBooks('');
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+          // Books grid
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _filteredBooks.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.search_off, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text(
+                              _searchController.text.isEmpty
+                                  ? 'No books found'
+                                  : 'No books match your search',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            if (_searchController.text.isNotEmpty) ...[
+                              SizedBox(height: 8),
+                              Text(
+                                'Try searching for different keywords',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        padding: EdgeInsets.all(8),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: _filteredBooks.length,
+                        itemBuilder: (context, index) {
+                          final book = _filteredBooks[index];
+                          return BookCard(
+                            book: book,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookDetailScreen(book: book),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
     );
   }
 }

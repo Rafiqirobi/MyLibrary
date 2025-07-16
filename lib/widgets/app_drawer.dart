@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:my_library/services/auth_service.dart';
 import 'package:my_library/models/user.dart';
+import 'package:my_library/screens/reader/reader_home.dart';
+import 'package:my_library/screens/clerk/clerk_home.dart';
+import 'package:my_library/screens/manager/manager_home.dart';
+import 'package:my_library/screens/reader/favorites_screen.dart';
+import 'package:my_library/screens/reader/wishlist_screen.dart';
+import 'package:my_library/screens/settings/settings_screen.dart';
+import 'package:my_library/screens/auth/login_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -29,14 +36,50 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(Icons.home),
                 title: Text('Home'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/reader');
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReaderHome(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.book),
                 title: Text('My Books'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/reader/my-books');
+                  Navigator.pop(context);
+                  // Show placeholder for now
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('My Books feature coming soon!')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.favorite),
+                title: Text('Favorites'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FavoritesScreen(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.bookmark),
+                title: Text('Wishlist'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WishlistScreen(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -45,21 +88,35 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(Icons.dashboard),
                 title: Text('Dashboard'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/clerk');
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClerkHome(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.add_box),
                 title: Text('Add Book'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/clerk/add-book');
+                  Navigator.pop(context);
+                  // Show placeholder for now
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Add Book feature coming soon!')),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.library_books),
                 title: Text('Manage Books'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/clerk/manage-books');
+                  Navigator.pop(context);
+                  // Show placeholder for now
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Manage Books feature coming soon!')),
+                  );
                 },
               ),
             ],
@@ -68,21 +125,33 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(Icons.dashboard),
                 title: Text('Dashboard'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/manager');
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManagerHome(),
+                    ),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.people),
                 title: Text('User Management'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/manager/user-management');
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('User Management feature coming soon!')),
+                  );
                 },
               ),
               ListTile(
                 leading: Icon(Icons.analytics),
                 title: Text('Reports'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/manager/reports');
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Reports feature coming soon!')),
+                  );
                 },
               ),
             ],
@@ -91,15 +160,26 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
-                // Navigate to settings screen
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(),
+                  ),
+                );
               },
             ),
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () async {
+                Navigator.pop(context);
                 await authService.logout();
-                Navigator.popAndPushNamed(context, '/');
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (route) => false,
+                );
               },
             ),
           ] else ...[
@@ -107,7 +187,8 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(Icons.login),
               title: Text('Login'),
               onTap: () {
-                Navigator.popAndPushNamed(context, '/');
+                Navigator.pop(context);
+                // Already showing login if not authenticated
               },
             ),
           ],
